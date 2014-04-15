@@ -2,7 +2,7 @@
 
 ### Platform Support
 
-This plugin supports apps running on both iOS and Android.
+This plugin supports apps running on iOS.
 
 ### Version Requirements
 
