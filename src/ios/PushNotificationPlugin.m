@@ -28,7 +28,7 @@ typedef void (^UACordovaVoidCallbackBlock)(NSArray *args);
 - (void)takeOff {
     //Init Airship launch options
     UAConfig *config = [UAConfig defaultConfig];
-    
+
     NSDictionary *settings = self.commandDelegate.settings;
 
     config.productionAppKey = [settings valueForKey:@"com.urbanairship.production_app_key"] ?: config.productionAppKey;
@@ -39,7 +39,7 @@ typedef void (^UACordovaVoidCallbackBlock)(NSArray *args);
     if ([settings valueForKey:@"com.urbanairship.in_production"]) {
         config.inProduction = [[settings valueForKey:@"com.urbanairship.in_production"] boolValue];
     }
-    
+
     // Create Airship singleton that's used to talk to Urban Airship servers.
     // Please populate AirshipConfig.plist with your info from http://go.urbanairship.com
     [UAirship takeOff:config];
@@ -73,13 +73,13 @@ typedef void (^UACordovaVoidCallbackBlock)(NSArray *args);
         UA_LERR(@"Parameter number mismatch in cordova callback: expected %d and received %d", types.count, args.count);
         return NO;
     }
-    
+
     return YES;
 }
 
 - (CDVPluginResult *)pluginResultForValue:(id)value {
     CDVPluginResult *result;
-    
+
     /*
      NSSString -> String
      NSNumber --> (Integer | Double)
@@ -87,7 +87,7 @@ typedef void (^UACordovaVoidCallbackBlock)(NSArray *args);
      NSDictionary --> Object
      nil --> no return value
      */
-    
+
     if ([value isKindOfClass:[NSString class]]) {
         result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
                                    messageAsString:[value stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
@@ -109,7 +109,7 @@ typedef void (^UACordovaVoidCallbackBlock)(NSArray *args);
         UA_LERR(@"Cordova callback block returned unrecognized type: %@", NSStringFromClass([value class]));
         return nil;
     }
-    
+
     return result;
 }
 
@@ -130,7 +130,7 @@ typedef void (^UACordovaVoidCallbackBlock)(NSArray *args);
 
         //execute the block. the return value should be an obj-c object holding what we want to pass back to cordova.
         id returnValue = block(command.arguments);
-    
+
         CDVPluginResult *result = [self pluginResultForValue:returnValue];
         if (result) {
             [self succeedWithPluginResult:result withCallbackID:command.callbackId];
@@ -368,10 +368,10 @@ typedef void (^UACordovaVoidCallbackBlock)(NSArray *args);
 
         [returnDictionary setObject:incomingAlert forKey:@"message"];
         [returnDictionary setObject:incomingExtras forKey:@"extras"];
-        
+
         //reset incoming push data until the next background push comes in
         self.incomingNotification = nil;
-        
+
         return returnDictionary;
     }];
 }
@@ -392,7 +392,7 @@ typedef void (^UACordovaVoidCallbackBlock)(NSArray *args);
                                           zero,@"startMinute",
                                           zero,@"endHour",
                                           zero,@"endMinute",nil];
-        
+
         //this can be nil if quiet time is not set
         if (quietTimeDictionary) {
 
@@ -501,7 +501,7 @@ typedef void (^UACordovaVoidCallbackBlock)(NSArray *args);
         endDate = [gregorian dateFromComponents:endComponents];
 
         [[UAPush shared] setQuietTimeFrom:startDate to:endDate withTimeZone:[NSTimeZone localTimeZone]];
-        [[UAPush shared] updateRegistration];        
+        [[UAPush shared] updateRegistration];
     }];
 }
 
@@ -542,14 +542,14 @@ typedef void (^UACordovaVoidCallbackBlock)(NSArray *args);
 #pragma mark UARegistrationObservers
 - (void)registerDeviceTokenSucceeded {
     UA_LINFO(@"PushNotificationPlugin: registered for remote notifications");
-    
+
     [self raiseRegistration:YES withpushID:[UAirship shared].deviceToken];
 }
 
 - (void)registerDeviceTokenFailed:(UAHTTPRequest *)request {
     UA_LINFO(@"PushNotificationPlugin: Failed to register for remote notifications with request: %@", request);
-    
-    [self raiseRegistration:NO withpushID:@""]; 
+
+    [self raiseRegistration:NO withpushID:@""];
 }
 
 #pragma mark UAPushNotificationDelegate
@@ -573,7 +573,11 @@ typedef void (^UACordovaVoidCallbackBlock)(NSArray *args);
 #pragma mark Other stuff
 
 - (void)dealloc {
-    [UAPush shared].pushNotificationDelegate = nil;
+    if([UAPush shared].pushNotificationDelegate == self){
+        //only remove the delegate if this is the webview/plugin that is currently receiving
+        //the delegate notifications.
+        [UAPush shared].pushNotificationDelegate = nil;
+    }
     [[UAPush shared] removeObserver:self];
 
 }
