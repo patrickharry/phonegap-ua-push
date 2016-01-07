@@ -37,9 +37,9 @@
             <uses-permission android:name="android.permission.GET_ACCOUNTS" />
             <uses-permission android:name="android.permission.WAKE_LOCK" />
             <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-            <uses-permission android:name="$PACKAGE_NAME.permission.C2D_MESSAGE" />
+            <uses-permission android:name="za.co.sportsdaily.permission.C2D_MESSAGE" />
             <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-            <permission android:name="$PACKAGE_NAME.permission.C2D_MESSAGE" android:protectionLevel="signature" />
+            <permission android:name="za.co.sportsdaily.permission.C2D_MESSAGE" android:protectionLevel="signature" />
         </config-file>
 
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
@@ -49,7 +49,7 @@
               <intent-filter>
                   <action android:name="com.google.android.c2dm.intent.RECEIVE" />
                   <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
-                  <category android:name="$PACKAGE_NAME" />
+                  <category android:name="za.co.sportsdaily" />
               </intent-filter>
             </receiver>
 
@@ -61,7 +61,7 @@
             <service android:name="com.urbanairship.analytics.EventService" android:label="Event Service"/>
             
             <provider android:name="com.urbanairship.UrbanAirshipProvider"
-                android:authorities="$PACKAGE_NAME.urbanairship.provider"
+                android:authorities="za.co.sportsdaily.urbanairship.provider"
                 android:exported="false"
                 android:multiprocess="true" />
 
